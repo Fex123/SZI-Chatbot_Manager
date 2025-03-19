@@ -1,10 +1,10 @@
 import customtkinter as ctk
 from tkinter import filedialog
-from test import WissensbasisAPI  # Stelle sicher, dass diese Klasse die Methode create_document_by_file implementiert
+from api_connection import WissensbasisAPI  
 
 def choose_file():
-    file_path = filedialog.askopenfilename(
-        title="Wähle eine Datei",
+    file_paths = filedialog.askopenfilenames(
+        title="Wähle eine oder mehrere Dateien",
         filetypes=[
             ("Markdown files", "*.md"),
             ("Text files", "*.txt"),
@@ -12,32 +12,37 @@ def choose_file():
             ("Word files", "*.doc;*.docx")
         ]
     )
-    if file_path:
+    if file_paths:
         file_entry.delete(0, ctk.END)
-        file_entry.insert(0, file_path)
-        status_label.configure(text="Datei ausgewählt.", text_color="#1f6feb")
+        file_entry.insert(0, ";".join(file_paths))
+        status_label.configure(text="Dateien ausgewählt.", text_color="#1f6feb")
 
 def upload_file():
-    # Manuelle Eingabe der Wissensbasis-ID
     dataset_id = kb_id_entry.get().strip()
-    file_path = file_entry.get().strip()
+    files_text = file_entry.get().strip()
     
-    if not dataset_id or not file_path:
+    if not dataset_id or not files_text:
         status_label.configure(text="Fehler: Wissensbasis-ID und Datei erforderlich!", text_color="#DC3545")
         return
 
-    status_label.configure(text="Datei wird hochgeladen...", text_color="#FD7E14")
+    status_label.configure(text="Dateien werden hochgeladen...", text_color="#FD7E14")
     root.update()  # Sofortiges Aktualisieren der Statusanzeige
     
     api = WissensbasisAPI(api_key="dataset-XFb2bSp8KyR553cekNo9FIZ6")
-    response = api.create_document_by_file(dataset_id, file_path)
     
-    if response:
-        status_label.configure(text="Upload erfolgreich!", text_color="#198754")
+    file_paths = [fp.strip() for fp in files_text.split(";") if fp.strip()]
+    all_success = True
+    for file_path in file_paths:
+        response = api.create_document_by_file(dataset_id, file_path)
+        if not response:
+            all_success = False
+    
+    if all_success:
+        status_label.configure(text="Alle Uploads erfolgreich!", text_color="#198754")
         file_entry.delete(0, ctk.END)
         file_entry.insert(0, "Keine Datei ausgewählt")
     else:
-        status_label.configure(text="Upload fehlgeschlagen!", text_color="#DC3545")
+        status_label.configure(text="Mindestens ein Upload fehlgeschlagen!", text_color="#DC3545")
 
 # Hauptfenster erstellen
 root = ctk.CTk()
