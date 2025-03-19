@@ -4,17 +4,16 @@ import json
 
 class WissensbasisAPI:
     def __init__(self, api_key):
-        # Passe die API-URL ggf. an die Produktionsumgebung an
+        # Initialize API connection with base URL, headers, and default chunk rule
         self.api_url = "http://localhost:3100/v1"
         self.api_key = api_key
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
-        # Hintergrund definierte Chunk Einstellungen inklusive der erforderlichen pre_processing_rules
         self.default_chunk_rule = {
             "rules": {
-                "pre_processing_rules": [],  # Leere Liste als Standard
+                "pre_processing_rules": [],
                 "segmentation": {
                     "separator": "#",
                     "max_tokens": 1000
@@ -24,6 +23,7 @@ class WissensbasisAPI:
         }
 
     def create_document_by_file(self, dataset_id, file_path, doc_name=None, process_rule=None):
+        # Upload document as file with optional custom processing rule
         """
         Uploadt ein Dokument als Datei und übernimmt die Einstellungen im process_rule.
         Falls kein doc_name angegeben wird, nutzt er den Dateinamen aus file_path.
@@ -32,7 +32,6 @@ class WissensbasisAPI:
             doc_name = os.path.basename(file_path)
         
         url = f"{self.api_url}/datasets/{dataset_id}/document/create-by-file"
-        # Verwende die Hintergrund-Chuck Einstellungen, falls nichts übergeben wurde
         if process_rule is None:
             process_rule = self.default_chunk_rule
         
@@ -43,10 +42,9 @@ class WissensbasisAPI:
         }
         
         files = {
-            'data': (None, json.dumps(data_field), 'text/plain'),
-            'file': open(file_path, 'rb')
+            "data": (None, json.dumps(data_field), "text/plain"),
+            "file": open(file_path, "rb")
         }
-        # Für multipart/form-data entfernt man den "Content-Type"-Header, damit requests diesen korrekt setzt.
         headers = self.headers.copy()
         headers.pop("Content-Type", None)
         response = requests.post(url, files=files, headers=headers)
@@ -62,12 +60,10 @@ class WissensbasisAPI:
             print("Fehler beim Erstellen des Dokuments per Datei:", data)
             return None
 
-# Beispiel API-Nutzung:
-
+# Example usage of WissensbasisAPI
 api = WissensbasisAPI(api_key="dataset-MIUuX7XZOXZ3tg0oIyyW4IUW")
-dataset_id = "c646b92d-0186-488b-95a0-e5907cc11294"  # ID der existierenden Wissensbasis
+dataset_id = "c646b92d-0186-488b-95a0-e5907cc11294"
 
-# Beispiel für benutzerdefinierte Chunk-Einstellungen:
 custom_rule = {
     "rules": {
         "pre_processing_rules": [
@@ -82,5 +78,4 @@ custom_rule = {
     "mode": "custom"
 }
 
-# Hochladen der Datei. Der Dokumentname wird automatisch aus dem Dateinamen abgeleitet.
 api.create_document_by_file(dataset_id, "C:/Users/Anwender/Desktop/Studienarbeit/Github Projekt/neuer Ordner/test.txt", process_rule=custom_rule)

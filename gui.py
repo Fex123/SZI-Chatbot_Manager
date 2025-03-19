@@ -3,6 +3,7 @@ from tkinter import filedialog
 from api_connection import WissensbasisAPI  
 
 def choose_file():
+    # Open a file dialog to select one or more files
     file_paths = filedialog.askopenfilenames(
         title="Wähle eine oder mehrere Dateien",
         filetypes=[
@@ -18,6 +19,7 @@ def choose_file():
         status_label.configure(text="Dateien ausgewählt.", text_color="#1f6feb")
 
 def upload_file():
+    # Process file upload and update status based on the API response
     dataset_id = kb_id_entry.get().strip()
     files_text = file_entry.get().strip()
     
@@ -26,7 +28,7 @@ def upload_file():
         return
 
     status_label.configure(text="Dateien werden hochgeladen...", text_color="#FD7E14")
-    root.update()  # Sofortiges Aktualisieren der Statusanzeige
+    root.update()
     
     api = WissensbasisAPI(api_key="dataset-XFb2bSp8KyR553cekNo9FIZ6")
     
@@ -44,27 +46,23 @@ def upload_file():
     else:
         status_label.configure(text="Mindestens ein Upload fehlgeschlagen!", text_color="#DC3545")
 
-# Hauptfenster erstellen
+# Create and configure the main application window, then run the GUI loop
 root = ctk.CTk()
 root.title("SZI Assistent - Dokumenten Upload")
 root.geometry("600x400")
 root.resizable(False, False)
 
-# Hauptframe mit modernem Stil
 main_frame = ctk.CTkFrame(root, corner_radius=15)
 main_frame.pack(pady=20, padx=20, fill="both", expand=True)
 
-# Überschrift
 header_label = ctk.CTkLabel(main_frame, text="SZI Assistent", font=("Arial", 24, "bold"))
 header_label.pack(pady=(20, 10))
 
-# Wissensbasis-ID manuell eingeben
 kb_id_label = ctk.CTkLabel(main_frame, text="Wissensbasis-ID:")
 kb_id_label.pack(pady=(10, 0))
 kb_id_entry = ctk.CTkEntry(main_frame, width=250, placeholder_text="Geben Sie die Wissensbasis-ID ein")
 kb_id_entry.pack(pady=(0, 10))
 
-# Datei-Auswahl
 file_label = ctk.CTkLabel(main_frame, text="Datei auswählen:")
 file_label.pack(pady=(10, 0))
 file_entry = ctk.CTkEntry(main_frame, width=250, placeholder_text="Keine Datei ausgewählt")
