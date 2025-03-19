@@ -51,16 +51,26 @@ def upload_file():
     else:
         status_label.configure(text="Mindestens ein Upload fehlgeschlagen!", text_color="#DC3545")
 
-# Add functions to load and save config
+# Add helper function to get a writable config path
+def get_config_path():
+    import os
+    appdata = os.getenv("APPDATA")
+    config_folder = os.path.join(appdata, "SZI-Assistent")
+    if not os.path.exists(config_folder):
+        os.makedirs(config_folder)
+    return os.path.join(config_folder, "config.json")
+
+# Modify load_config() to use the writable path
 def load_config():
-    config_path = os.path.join(os.path.dirname(__file__), "config.json")
+    config_path = get_config_path()
     if os.path.exists(config_path):
         with open(config_path, "r") as f:
             return json.load(f)
     return {}
 
+# Modify save_config() to use the writable path
 def save_config(config):
-    config_path = os.path.join(os.path.dirname(__file__), "config.json")
+    config_path = get_config_path()
     with open(config_path, "w") as f:
         json.dump(config, f)
 
