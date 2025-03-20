@@ -77,5 +77,3 @@ custom_rule = {
     },
     "mode": "custom"
 }
-
-api.create_document_by_file(dataset_id, "C:/Users/Anwender/Desktop/Studienarbeit/Github Projekt/neuer Ordner/test.txt", process_rule=custom_rule)
