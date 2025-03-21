@@ -1,3 +1,4 @@
+import tkinter as tk
 import customtkinter as ctk
 from tkinter import filedialog
 from api_connection import WissensbasisAPI
@@ -50,7 +51,7 @@ def upload_file():
         status_label.configure(text="Mindestens ein Upload fehlgeschlagen!", text_color="#DC3545")
 
 def get_config_path():
-    appdata = os.getenv("APPDATA")
+    appdata = os.getenv("APPDATA") or os.getcwd() 
     config_folder = os.path.join(appdata, "SZI-Assistent")
     os.makedirs(config_folder, exist_ok=True)
     return os.path.join(config_folder, "config.json")
@@ -110,4 +111,5 @@ if "api_key" in config:
     api_key_entry.delete(0, ctk.END)
     api_key_entry.insert(0, config["api_key"])
 
-root.mainloop()
+if __name__ == '__main__':
+    root.mainloop()
